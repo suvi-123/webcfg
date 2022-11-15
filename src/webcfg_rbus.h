@@ -26,8 +26,6 @@
 #include <rbus/rbus_object.h>
 #include <rbus/rbus_property.h>
 #include <rbus/rbus_value.h>
-#include <rbus-core/rbus_core.h>
-#include <rbus-core/rbus_session_mgr.h>
 
 #include <wdmp-c.h>
 #include <wrp-c.h>
@@ -40,7 +38,7 @@
 #define buffLen 1024
 #define maxParamLen 128
 
-#define NUM_WEBCFG_ELEMENTS 9
+#define NUM_WEBCFG_ELEMENTS 14
 
 #define WEBCFG_COMPONENT_NAME "webconfig"
 #define MAX_PARAMETERNAME_LEN			4096
@@ -54,6 +52,13 @@
 #define WEBCFG_SUPPORTED_DOCS_PARAM	"Device.X_RDK_WebConfig.SupportedDocs"
 #define WEBCFG_SUPPORTED_VERSION_PARAM	"Device.X_RDK_WebConfig.SupportedSchemaVersion"
 #define WEBCFG_SUPPLEMENTARY_TELEMETRY_PARAM  "Device.X_RDK_WebConfig.SupplementaryServiceUrls.Telemetry"
+
+#define WEBCFG_MQTT_LOCATIONID_PARAM "Device.X_RDK_WebConfig.MQTT.LocationId"
+#define WEBCFG_MQTT_BROKER_PARAM "Device.X_RDK_WebConfig.MQTT.Broker"
+#define WEBCFG_MQTT_SUBSCRIBE_TOPIC_PARAM "Device.X_RDK_WebConfig.MQTT.SubscribeTopic"
+#define WEBCFG_PUBLISH_GET_TOPIC_PARAM "Device.X_RDK_WebConfig.MQTT.PublishGetTopic"
+#define WEBCFG_MQTT_PUBLISH_NOTIFY_TOPIC_PARAM "Device.X_RDK_WebConfig.MQTT.PublishNotifyTopic"
+
 
 #ifdef WAN_FAILOVER_SUPPORTED
 #define WEBCFG_INTERFACE_PARAM "Device.X_RDK_WanManager.CurrentActiveInterface"
