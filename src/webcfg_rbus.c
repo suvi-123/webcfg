@@ -996,6 +996,8 @@ rbusError_t webcfgSubdocForceResetSetHandler(rbusHandle_t handle, rbusProperty_t
 				if(ret != ERROR_SUCCESS)
 				{
 					WebcfgError("subdoc - %s, not present in webconfig db\n", subdocNames[i]);
+					WEBCFG_FREE(SubdocResetVal);
+			                SubdocResetVal=NULL;
 					return RBUS_ERROR_INVALID_INPUT;
 				}
 		        }
@@ -1006,12 +1008,16 @@ rbusError_t webcfgSubdocForceResetSetHandler(rbusHandle_t handle, rbusProperty_t
 				if(ret != ERROR_SUCCESS)
 				{
 					WebcfgError("Reset of subdoc - %s, is failed with errorcode - %d\n", subdocNames[i], ret);
+					WEBCFG_FREE(SubdocResetVal);
+                                        SubdocResetVal=NULL;
 					return RBUS_ERROR_BUS_ERROR;
 				}
 		        }
                 }
 		int rc = RBUS_ERROR_SUCCESS;
                 rc = publishSubdocResetEvent(SubdocResetVal);
+		WEBCFG_FREE(SubdocResetVal);
+		SubdocResetVal=NULL;
 		if(rc != RBUS_ERROR_SUCCESS)
 	        {
 	               WebcfgError("Failed to publish subdoc reset event : %d, %s\n", rc, rbusError_ToString(rc));
@@ -1774,6 +1780,7 @@ int set_rbus_RfcEnable(bool bValue)
 				WebcfgInfo("Webconfig is already started, so not starting again for dynamic RFC change.\n");
 			}
 		}
+		WEBCFG_FREE(buf);
 	}
 	else
 	{
@@ -2128,4 +2135,6 @@ void trigger_webcfg_forcedsync()
 	set_global_webcfg_forcedsync_needed(1);
 	WebcfgInfo("set webcfg_forcedsync_needed to %d\n", get_global_webcfg_forcedsync_needed());
 	set_rbus_ForceSync(str, &status);
+	WEBCFG_FREE(str);
+	str=NULL;
 }
