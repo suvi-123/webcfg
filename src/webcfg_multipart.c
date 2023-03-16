@@ -1590,84 +1590,78 @@ void createCurlHeader( struct curl_slist *list, struct curl_slist **header_list,
 		WEBCFG_FREE(schema_header);
 	}
 
-	if(!get_global_supplementarySync())
+	if(supportedVersion_header == NULL)
 	{
-		if(supportedVersion_header == NULL)
-		{
-			supportedVersion = getsupportedVersion();
+		supportedVersion = getsupportedVersion();
 
-			if(supportedVersion !=NULL)
-			{
-				supported_version_size = strlen(supportedVersion)+strlen("X-System-Schema-Version: ");
-				supportedVersion_header = (char *) malloc(supported_version_size+1);
-				memset(supportedVersion_header,0,supported_version_size+1);
-				WebcfgDebug("supportedVersion fetched is %s\n", supportedVersion);
-				snprintf(supportedVersion_header, supported_version_size+1, "X-System-Schema-Version: %s", supportedVersion);
-				WebcfgInfo("supportedVersion_header formed %s\n", supportedVersion_header);
-				list = curl_slist_append(list, supportedVersion_header);
-			}
-			else
-			{
-				WebcfgInfo("supportedVersion fetched is NULL\n");
-			}
-		}
-		else
+		if(supportedVersion !=NULL)
 		{
+			supported_version_size = strlen(supportedVersion)+strlen("X-System-Schema-Version: ");
+			supportedVersion_header = (char *) malloc(supported_version_size+1);
+			memset(supportedVersion_header,0,supported_version_size+1);
+			WebcfgDebug("supportedVersion fetched is %s\n", supportedVersion);
+			snprintf(supportedVersion_header, supported_version_size+1, "X-System-Schema-Version: %s", supportedVersion);
 			WebcfgInfo("supportedVersion_header formed %s\n", supportedVersion_header);
 			list = curl_slist_append(list, supportedVersion_header);
 		}
-
-		if(supportedDocs_header == NULL)
-		{
-			supportedDocs = getsupportedDocs();
-
-			if(supportedDocs !=NULL)
-			{
-				supported_doc_size = strlen(supportedDocs)+strlen("X-System-Supported-Docs: ");
-				supportedDocs_header = (char *) malloc(supported_doc_size+1);
-				memset(supportedDocs_header,0,supported_doc_size+1);
-				WebcfgDebug("supportedDocs fetched is %s\n", supportedDocs);
-				snprintf(supportedDocs_header, supported_doc_size+1, "X-System-Supported-Docs: %s", supportedDocs);
-				WebcfgInfo("supportedDocs_header formed %s\n", supportedDocs_header);
-				list = curl_slist_append(list, supportedDocs_header);
-			}
-			else
-			{
-				WebcfgInfo("SupportedDocs fetched is NULL\n");
-			}
-		}
 		else
 		{
-			WebcfgInfo("supportedDocs_header formed %s\n", supportedDocs_header);
-			list = curl_slist_append(list, supportedDocs_header);
+			WebcfgInfo("supportedVersion fetched is NULL\n");
 		}
 	}
 	else
 	{
-		if(supplementaryDocs_header == NULL)
-		{
-			supplementaryDocs = getsupplementaryDocs();
+		WebcfgInfo("supportedVersion_header formed %s\n", supportedVersion_header);
+		list = curl_slist_append(list, supportedVersion_header);
+	}
+	if(supportedDocs_header == NULL)
+	{
+		supportedDocs = getsupportedDocs();
 
-			if(supplementaryDocs !=NULL)
-			{
-				supplementary_docs_size = strlen(supplementaryDocs)+strlen("X-System-SupplementaryService-Sync: ");
-				supplementaryDocs_header = (char *) malloc(supplementary_docs_size+1);
-				memset(supplementaryDocs_header,0,supplementary_docs_size+1);
-				WebcfgDebug("supplementaryDocs fetched is %s\n", supplementaryDocs);
-				snprintf(supplementaryDocs_header, supplementary_docs_size+1, "X-System-SupplementaryService-Sync: %s", supplementaryDocs);
-				WebcfgInfo("supplementaryDocs_header formed %s\n", supplementaryDocs_header);
-				list = curl_slist_append(list, supplementaryDocs_header);
-			}
-			else
-			{
-				WebcfgInfo("supplementaryDocs fetched is NULL\n");
-			}
+		if(supportedDocs !=NULL)
+		{
+			supported_doc_size = strlen(supportedDocs)+strlen("X-System-Supported-Docs: ");
+			supportedDocs_header = (char *) malloc(supported_doc_size+1);
+			memset(supportedDocs_header,0,supported_doc_size+1);
+			WebcfgDebug("supportedDocs fetched is %s\n", supportedDocs);
+			snprintf(supportedDocs_header, supported_doc_size+1, "X-System-Supported-Docs: %s", supportedDocs);
+			WebcfgInfo("supportedDocs_header formed %s\n", supportedDocs_header);
+			list = curl_slist_append(list, supportedDocs_header);
 		}
 		else
 		{
+			WebcfgInfo("SupportedDocs fetched is NULL\n");
+		}
+	}
+	else
+	{
+		WebcfgInfo("supportedDocs_header formed %s\n", supportedDocs_header);
+		list = curl_slist_append(list, supportedDocs_header);
+	}
+	
+	if(supplementaryDocs_header == NULL)
+	{
+		supplementaryDocs = getsupplementaryDocs();
+
+		if(supplementaryDocs !=NULL)
+		{
+			supplementary_docs_size = strlen(supplementaryDocs)+strlen("X-System-SupplementaryService-Sync: ");
+			supplementaryDocs_header = (char *) malloc(supplementary_docs_size+1);
+			memset(supplementaryDocs_header,0,supplementary_docs_size+1);
+			WebcfgDebug("supplementaryDocs fetched is %s\n", supplementaryDocs);
+			snprintf(supplementaryDocs_header, supplementary_docs_size+1, "X-System-SupplementaryService-Sync: %s", supplementaryDocs);
 			WebcfgInfo("supplementaryDocs_header formed %s\n", supplementaryDocs_header);
 			list = curl_slist_append(list, supplementaryDocs_header);
 		}
+		else
+		{
+			WebcfgInfo("supplementaryDocs fetched is NULL\n");
+		}
+	}
+	else
+	{
+		WebcfgInfo("supplementaryDocs_header formed %s\n", supplementaryDocs_header);
+		list = curl_slist_append(list, supplementaryDocs_header);
 	}
 
 	if(strlen(g_bootTime) ==0)
