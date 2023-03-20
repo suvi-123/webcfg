@@ -259,6 +259,16 @@ target_link_libraries (test_rbus_fr -lcunit -lwrp-c -lcimplog -lmsgpackc -lcurl 
 target_link_libraries (test_rbus_fr gcov -Wl,--no-as-needed )
 endif (WEBCONFIG_BIN_SUPPORT)
 
+#-----------------------------------------------------------------------
+# test_cli_util.c
+
+add_test(NAME test_cli_util COMMAND ${MEMORY_CHECK} ./test_cli_util)
+
+add_executable(test_cli_util test_cli_util.c)
+
+target_link_libraries (test_cli_util -lcunit -lwrp-c -lcimplog -lmsgpackc -lcurl -lpthread  -lm -luuid -ltrower-base64 -lwdmp-c -lcjson  -lrbus)
+
+target_link_libraries (test_cli_util gcov -Wl,--no-as-needed )
 
 
 # Code coverage
