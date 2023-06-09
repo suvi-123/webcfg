@@ -23,6 +23,7 @@
 #include <wrp-c.h>
 #include <CUnit/Basic.h>
 #include "../src/webcfg_rbus.h"
+#include "../src/webcfg_wanhandle.h"
 #define FILE_URL "/tmp/webcfg_url"
 
 #define UNUSED(x) (void )(x)
@@ -63,6 +64,22 @@ int get_global_webcfg_forcedsync_started()
 {
     return false;
 }
+
+int get_global_wanstatussync_start()
+{
+	return false;
+}
+
+void set_global_wanstatus_sync(int value)
+{
+	UNUSED(value);
+}
+
+int get_global_wanstatus_sync()
+{
+	return false;
+}
+
 void set_global_supplementarySync(int value)
 {
     UNUSED(value);

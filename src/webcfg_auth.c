@@ -41,7 +41,7 @@ void execute_token_script(char *token, char *name, size_t len, char *mac, char *
 
 char* get_global_auth_token()
 {
-    return webpa_auth_token;
+	return webpa_auth_token;
 }
 
 char* get_global_serialNum()

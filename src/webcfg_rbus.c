@@ -2199,11 +2199,3 @@ void registerRbusLogger()
 	rbus_registerLogHandler(rbus_log_handler);
 	WebcfgDebug("Registered rbus log handler\n");
 }
-=======
-	set_global_wanstatus_sync(1);
-	WebcfgInfo("set wanstatus_sync to %d\n", get_global_wanstatus_sync());
-	set_rbus_ForceSync(str, &status);
-	WebcfgInfo("set_rbus_ForceSync on wan status event done\n");
-}
-
->>>>>>> upstream/wan_restore
