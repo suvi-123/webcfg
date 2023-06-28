@@ -464,7 +464,7 @@ int createMqttHeader(char **header_list)
 		version_header = (char *) malloc(sizeof(char)*MAX_BUF_SIZE);
 		if(version_header !=NULL)
 		{
-			refreshConfigVersionList(version, 0);
+			refreshConfigVersionList(version, 0,docList);
 			snprintf(version_header, MAX_BUF_SIZE, "\r\nIF-NONE-MATCH:%s", ((strlen(version)!=0) ? version : "0"));
 			WebcfgInfo("version_header formed %s\n", version_header);
 			//WEBCFG_FREE(version_header);

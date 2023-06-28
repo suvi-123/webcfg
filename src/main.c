@@ -16,7 +16,9 @@
 
 #include "stdlib.h"
 #include "signal.h"
+#ifdef WEBCONFIG_HTTP_SUPPORT
 #include <curl/curl.h>
+#endif
 #ifdef INCLUDE_BREAKPAD
 #ifndef DEVICE_CAMERA
 #include "breakpad_wrapper.h"
@@ -103,7 +105,7 @@ int main()
     		WebcfgInfo("systemReadyTime is %s\n", systemReadyTime);
 		set_global_systemReadyTime(systemReadyTime);
 		// wait for upstream subscriber for 5mins
-		waitForUpstreamEventSubscribe(300);
+		waitForUpstreamEventSubscribe(5);
 		ret = rbus_GetValueFromDB( PARAM_RFC_ENABLE, &strValue );
 		if (ret == 0)
 		{

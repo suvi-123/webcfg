@@ -38,7 +38,7 @@
 #define buffLen 1024
 #define maxParamLen 128
 
-#define NUM_WEBCFG_ELEMENTS1 7
+#define NUM_WEBCFG_ELEMENTS1 10
 
 #if !defined (WEBCONFIG_MQTT_SUPPORT) || defined (WEBCONFIG_HTTP_SUPPORT)
 #define NUM_WEBCFG_ELEMENTS2 3

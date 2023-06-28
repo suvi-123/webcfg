@@ -84,9 +84,11 @@ char g_deviceWanMac[64]={'\0'};
 char g_RebootReason[64]={'\0'};
 static char g_transID[64]={'\0'};
 static char * g_contentLen = NULL;
+#if !defined (WEBCONFIG_MQTT_SUPPORT) || defined (WEBCONFIG_HTTP_SUPPORT)
 static char *supportedVersion_header=NULL;
 static char *supportedDocs_header=NULL;
 static char *supplementaryDocs_header=NULL;
+#endif
 static multipartdocs_t *g_mp_head = NULL;
 pthread_mutex_t multipart_t_mut =PTHREAD_MUTEX_INITIALIZER;
 static int eventFlag = 0;
@@ -233,7 +235,7 @@ WEBCFG_STATUS webcfg_http_request(char **configData, int r_count, int status, lo
 			return WEBCFG_FAILURE;
 		}
 		data.data[0] = '\0';
-		createCurlHeader(list, &headers_list, status, &transID);
+		createCurlHeader(list, &headers_list, status, &transID, &subdoclist);
 		if(transID !=NULL)
 		{
 			*transaction_id = strdup(transID);
@@ -447,6 +449,8 @@ WEBCFG_STATUS webcfg_http_request(char **configData, int r_count, int status, lo
 	{
 		WebcfgError("curl init failure\n");
 	}
+#else
+#endif
 	return WEBCFG_FAILURE;
 }
 
@@ -1997,6 +2001,7 @@ void createCurlHeader( struct curl_slist *list, struct curl_slist **header_list,
 	}
 	*header_list = list;
 }
+#endif
 
 char* generate_trans_uuid()
 {

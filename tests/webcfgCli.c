@@ -31,7 +31,9 @@
 #include "../src/webcfg_notify.h"
 #include "../src/webcfg_metadata.h"
 #include <msgpack.h>
+#ifdef WEBCONFIG_HTTP_SUPPORT
 #include <curl/curl.h>
+#endif
 #include <base64.h>
 #include "../src/webcfg_generic.h"
 #include "../src/webcfg_event.h"

@@ -183,6 +183,7 @@ target_link_libraries (test_metadata gcov -Wl,--no-as-needed )
 
 #-------------------------------------------------------------------------------
 #   test_root
+#include <curl/curl.h>
 #-------------------------------------------------------------------------------
 add_test(NAME test_root COMMAND ${MEMORY_CHECK} ./test_root)
 

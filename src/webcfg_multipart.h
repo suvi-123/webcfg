@@ -17,7 +17,7 @@
 #define REQUEST_H
 
 #include <stdint.h>
-#if !defined WEBCONFIG_MQTT_SUPPORT || defined WEBCONFIG_HTTP_SUPPORT
+#if !defined (WEBCONFIG_MQTT_SUPPORT) || defined (WEBCONFIG_HTTP_SUPPORT)
 #include <curl/curl.h>
 #endif
 #include "webcfg.h"

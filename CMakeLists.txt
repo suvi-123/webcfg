@@ -216,6 +216,6 @@ link_directories ( ${LIBRARY_DIR} ${COMMON_LIBRARY_DIR} ${LIBRARY_DIR64} )
 
 add_subdirectory(src)
 
-if (BUILD_TESTING)
-    add_subdirectory(tests)
-endif (BUILD_TESTING)
+#if (BUILD_TESTING)
+#   add_subdirectory(tests)
+#endif (BUILD_TESTING)

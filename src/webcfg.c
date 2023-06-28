@@ -257,8 +257,7 @@ void *WebConfigMultipartTask(void *status)
 		if ( retry_flag == 0)
 		{
 		//To disable supplementary sync for RDKV platforms
-		#if !defined(RDK_PERSISTENT_PATH_VIDEO && !defined(WEBCONFIG_MQTT_SUPPORT)) || (defined (WEBCONFIG_HTTP_SUPPORT))
-
+			#if (!defined(RDK_PERSISTENT_PATH_VIDEO) && !defined(WEBCONFIG_MQTT_SUPPORT)) || (defined (WEBCONFIG_HTTP_SUPPORT))
 			long tmOffset = 0;
 			tmOffset = getTimeOffset();
 			WebcfgInfo("The offset obtained from getTimeOffset is %ld\n", tmOffset);
