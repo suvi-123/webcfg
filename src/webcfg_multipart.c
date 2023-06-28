@@ -70,15 +70,17 @@ struct token_data {
 /*----------------------------------------------------------------------------*/
 static char g_ETAG[64]={'\0'};
 char webpa_aut_token[4096]={'\0'};
+#if !defined (WEBCONFIG_MQTT_SUPPORT) || defined (WEBCONFIG_HTTP_SUPPORT) || defined (WAN_FAILOVER_SUPPORTED)
 static char g_interface[32]={'\0'};
-static char g_systemReadyTime[64]={'\0'};
-static char g_FirmwareVersion[64]={'\0'};
-static char g_bootTime[64]={'\0'};
-static char g_productClass[64]={'\0'};
-static char g_ModelName[64]={'\0'};
-static char g_PartnerID[64]={'\0'};
-static char g_AccountID[64]={'\0'};
-static char g_deviceWanMac[64]={'\0'};
+#endif
+char g_systemReadyTime[64]={'\0'};
+char g_FirmwareVersion[64]={'\0'};
+char g_bootTime[64]={'\0'};
+char g_productClass[64]={'\0'};
+char g_ModelName[64]={'\0'};
+char g_PartnerID[64]={'\0'};
+char g_AccountID[64]={'\0'};
+char g_deviceWanMac[64]={'\0'};
 char g_RebootReason[64]={'\0'};
 static char g_transID[64]={'\0'};
 static char * g_contentLen = NULL;
@@ -195,6 +197,7 @@ WEBCFG_STATUS checkAkerDoc();
 */
 WEBCFG_STATUS webcfg_http_request(char **configData, int r_count, int status, long *code, char **transaction_id, char* contentType, size_t *dataSize, char* docname)
 {
+#if !defined (WEBCONFIG_MQTT_SUPPORT) || defined (WEBCONFIG_HTTP_SUPPORT)
 	CURL *curl;
 	CURLcode res;
 	CURLcode time_res;
@@ -230,7 +233,7 @@ WEBCFG_STATUS webcfg_http_request(char **configData, int r_count, int status, lo
 			return WEBCFG_FAILURE;
 		}
 		data.data[0] = '\0';
-		createCurlHeader(list, &headers_list, status, &transID, &subdoclist);
+		createCurlHeader(list, &headers_list, status, &transID);
 		if(transID !=NULL)
 		{
 			*transaction_id = strdup(transID);
@@ -1114,7 +1117,7 @@ size_t headr_callback(char *buffer, size_t size, size_t nitems, void* data)
 	char* final_header = NULL;
 	char header_str[64] = {'\0'};
 	size_t content_len = 0;
-
+	(void) data;
 	etag_len = strlen(ETAG_HEADER);
 	content_len = strlen(CONTENT_LENGTH_HEADER);
 	if( nitems > etag_len )
@@ -1307,6 +1310,36 @@ int readFromFile(char *filename, char **data, int *len)
 	(*data)[ch_count] ='\0';
 	fclose(fp);
 	return 1;
+}
+
+/* Traverse through db list to get docnames of all docs with root.
+e.g. root,ble,lan,mesh,moca. */
+void getConfigDocList(char *docList)
+{
+	char *docList_tmp = NULL;
+	webconfig_db_data_t *temp = NULL;
+	temp = get_global_db_node();
+
+	if( NULL != temp)
+	{
+		sprintf(docList, "%s", "root");
+		WebcfgDebug("docList is %s\n", docList);
+
+		while (NULL != temp)
+		{
+			if( temp->name != NULL)
+			{
+				if( strcmp(temp->name,"root") !=0 )
+				{
+					docList_tmp = strdup(docList);
+					sprintf(docList, "%s,%s",docList_tmp, temp->name);
+					WEBCFG_FREE(docList_tmp);
+				}
+			}
+			temp= temp->next;
+		}
+		WebcfgDebug("Final docList is %s len %zu\n", docList, strlen(docList));
+	}
 }
 
 void getRootDocVersionFromDBCache(uint32_t *rt_version, char **rt_string, int *subdoclist)
@@ -1508,6 +1541,7 @@ void refreshConfigVersionList(char *versionsList, int http_status, char *docsLis
  * @param[out] trans_uuid for sync
  * @param[out] header_list output curl header list
 */
+#if !defined WEBCONFIG_MQTT_SUPPORT || defined WEBCONFIG_HTTP_SUPPORT
 void createCurlHeader( struct curl_slist *list, struct curl_slist **header_list, int status, char ** trans_uuid, char **subdocList)
 {
 	char *version_header = NULL;
@@ -1613,11 +1647,17 @@ void createCurlHeader( struct curl_slist *list, struct curl_slist **header_list,
 			supportedDocs_header = (char *) malloc(supported_doc_size+1);
 			if(supportedDocs_header != NULL)
 			{
+				supported_doc_size = strlen(supportedDocs)+strlen("X-System-Supported-Docs: ");
+				supportedDocs_header = (char *) malloc(supported_doc_size+1);
 				memset(supportedDocs_header,0,supported_doc_size+1);
 				WebcfgDebug("supportedDocs fetched is %s\n", supportedDocs);
 				snprintf(supportedDocs_header, supported_doc_size+1, "X-System-Supported-Docs: %s", supportedDocs);
 				WebcfgInfo("supportedDocs_header formed %s\n", supportedDocs_header);
 				list = curl_slist_append(list, supportedDocs_header);
+			}
+			else
+			{
+				WebcfgInfo("SupportedDocs fetched is NULL\n");
 			}
 		}
 		else
