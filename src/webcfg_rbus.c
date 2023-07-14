@@ -24,7 +24,7 @@
 #include <time.h>
 #include "webcfg_rbus.h"
 
-#ifdef WEBCONFIG_MQTT_SUPPORT
+#ifdef FEATURE_SUPPORT_MQTTCM
 #include "webcfg_mqtt.h"
 #endif
 
@@ -1281,7 +1281,6 @@ WEBCFG_STATUS regWebConfigDataModel()
 {
 	rbusError_t ret1 = RBUS_ERROR_SUCCESS;
 	rbusError_t ret2 = RBUS_ERROR_SUCCESS;
-	rbusError_t ret3 = RBUS_ERROR_SUCCESS;
 
 	rbusError_t retPsmGet = RBUS_ERROR_BUS_ERROR;
 	WEBCFG_STATUS status = WEBCFG_SUCCESS;
@@ -1307,7 +1306,7 @@ WEBCFG_STATUS regWebConfigDataModel()
 
 	ret1 = rbus_regDataElements(rbus_handle, NUM_WEBCFG_ELEMENTS1, dataElements1);
 
-#if !defined (WEBCONFIG_MQTT_SUPPORT) || defined (WEBCONFIG_HTTP_SUPPORT)
+#if !defined (FEATURE_SUPPORT_MQTTCM)
 	rbusDataElement_t dataElements2[NUM_WEBCFG_ELEMENTS2] = {
 
 		{WEBCFG_URL_PARAM, RBUS_ELEMENT_TYPE_PROPERTY, {webcfgUrlGetHandler, webcfgUrlSetHandler, NULL, NULL, NULL, NULL}},
@@ -1318,12 +1317,7 @@ WEBCFG_STATUS regWebConfigDataModel()
 	ret2 = rbus_regDataElements(rbus_handle, NUM_WEBCFG_ELEMENTS2, dataElements2);
 #endif
 
-#ifdef WEBCONFIG_MQTT_SUPPORT
-	//ret3 = regWebConfigDataModel_mqtt();
-	ret3 = RBUS_ERROR_SUCCESS;
-#endif
-
-	if(ret1 == RBUS_ERROR_SUCCESS && ret2 == RBUS_ERROR_SUCCESS && ret3 == RBUS_ERROR_SUCCESS)
+	if(ret1 == RBUS_ERROR_SUCCESS && ret2 == RBUS_ERROR_SUCCESS)
 	{
 		WebcfgDebug("Registered data element %s with rbus \n ", WEBCFG_RFC_PARAM);
 
@@ -2018,26 +2012,26 @@ void sendNotification_rbus(char *payload, char *source, char *destination)
 		{
 			memset(notif_wrp_msg, 0, sizeof(wrp_msg_t));
 			notif_wrp_msg->msg_type = WRP_MSG_TYPE__EVENT;
-			WebcfgDebug("source: %s\n",source);
+			WebcfgInfo("source: %s\n",source);
 			notif_wrp_msg->u.event.source = source;
-			WebcfgDebug("destination: %s\n", destination);
+			WebcfgInfo("destination: %s\n", destination);
 			notif_wrp_msg->u.event.dest = strdup(destination);
 			contentType = strdup("application/json");
 			if(contentType != NULL)
 			{
 				notif_wrp_msg->u.event.content_type = contentType;
-				WebcfgDebug("content_type is %s\n",notif_wrp_msg->u.event.content_type);
+				WebcfgInfo("content_type is %s\n",notif_wrp_msg->u.event.content_type);
 			}
 			if(payload != NULL)
 			{
-				WebcfgDebug("Notification payload: %s\n",payload);
+				WebcfgInfo("Notification payload: %s\n",payload);
 				notif_wrp_msg->u.event.payload = (void *)payload;
 				notif_wrp_msg->u.event.payload_size = strlen(notif_wrp_msg ->u.event.payload);
 			}
 
 			msg_len = wrp_struct_to (notif_wrp_msg, WRP_BYTES, &msg_bytes);
 
-		#ifdef WEBCONFIG_MQTT_SUPPORT
+		#ifdef FEATURE_SUPPORT_MQTTCM
 			int ret = sendNotification_mqtt(payload, destination, notif_wrp_msg, msg_bytes);
 			if (ret)
 			{

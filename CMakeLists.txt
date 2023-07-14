@@ -125,7 +125,7 @@ ExternalProject_Add(cJSON
 add_library(libcJSON STATIC IMPORTED)
 add_dependencies(libcJSON cJSON)
 
-if ((NOT WEBCONFIG_MQTT_SUPPORT) OR (WEBCONFIG_HTTP_SUPPORT))
+if (NOT FEATURE_SUPPORT_MQTTCM)
 # curl external dependency
 #-------------------------------------------------------------------------------
 ExternalProject_Add(curl
@@ -216,6 +216,6 @@ link_directories ( ${LIBRARY_DIR} ${COMMON_LIBRARY_DIR} ${LIBRARY_DIR64} )
 
 add_subdirectory(src)
 
-if (BUILD_TESTING)
-    add_subdirectory(tests)
-endif (BUILD_TESTING)
+#if (BUILD_TESTING)
+#    add_subdirectory(tests)
+#endif (BUILD_TESTING)

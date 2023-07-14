@@ -133,7 +133,7 @@ void addWebConfgNotifyMsg(char *docname, uint32_t version, char *status, char *e
 
 		args->response_code = response_code;
 
-		WebcfgDebug("args->name:%s,args->application_status:%s,args->timeout:%lu,args->error_details:%s,args->version:%s,args->transaction_uuid:%s,args->type:%s,args->error_code:%lu,args->response_code:%lu\n",args->name,args->application_status, (long)args->timeout, args->error_details, args->version, args->transaction_uuid, args->type, (long)args->error_code,args->response_code );
+		WebcfgInfo("args->name:%s,args->application_status:%s,args->timeout:%lu,args->error_details:%s,args->version:%s,args->transaction_uuid:%s,args->type:%s,args->error_code:%lu,args->response_code:%lu\n",args->name,args->application_status, (long)args->timeout, args->error_details, args->version, args->transaction_uuid, args->type, (long)args->error_code,args->response_code );
 
 		args->next=NULL;
 
@@ -249,7 +249,7 @@ void* processWebConfgNotification()
 				{
 					source = (char*) malloc(sizeof(char) * sizeof(device_id));
 					strncpy(source, device_id, sizeof(device_id));
-					WebcfgDebug("source is %s\n", source);
+					WebcfgInfo("source is %s\n", source);
 					WebcfgInfo("stringifiedNotifyPayload is %s\n", stringifiedNotifyPayload);
 					//stringifiedNotifyPayload, source to be freed by sendNotification
 					sendNotification(stringifiedNotifyPayload, source, dest);
