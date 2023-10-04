@@ -2458,7 +2458,6 @@ WEBCFG_STATUS deleteRootAndMultipartDocs()
 	}
 	else
 	{
-		WebcfgError("deleteRootAndMultipartDocs failed\n");
 		return WEBCFG_FAILURE;
 	}
 }
