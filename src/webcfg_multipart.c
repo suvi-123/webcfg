@@ -338,7 +338,9 @@ WEBCFG_STATUS webcfg_http_request(char **configData, int r_count, int status, lo
 		if(webConfigURL !=NULL)
 		{
 			WebcfgInfo("Webconfig root ConfigURL is %s\n", webConfigURL);
+			printf("Before setopt\n");
 			res = curl_easy_setopt(curl, CURLOPT_URL, webConfigURL );
+			printf("After setopt\n");
 		}
 		else
 		{
@@ -422,16 +424,22 @@ WEBCFG_STATUS webcfg_http_request(char **configData, int r_count, int status, lo
 		{
 			WebcfgInfo("curl response Time: %.1f seconds\n", total);
 		}
+		printf("Before free\n");
 		curl_slist_free_all(headers_list);
 		WEBCFG_FREE(webConfigURL);
+		printf("After free\n");
+		
 		if(res != 0)
 		{
+			printf("inside res\n");
 			WebcfgError("curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
 		}
 		else
 		{
+			printf("Before resp_code\n");
 			if(response_code == 200)
-                        {
+            {
+				printf("Inside resp_code");
 				WebcfgDebug("checking content type\n");
 				content_res = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &ct);
 				WebcfgInfo("ct is %s, content_res is %d\n", ct, content_res);
@@ -466,9 +474,13 @@ WEBCFG_STATUS webcfg_http_request(char **configData, int r_count, int status, lo
 		}
 		if(rv != 1)
 		{
+			printf("Befor rv clean");
 			WEBCFG_FREE(data.data);
+			printf("After rv clean");
 		}
+		printf("Before clean up\n");
 		curl_easy_cleanup(curl);
+		printf("Before clean up\n");
 		return WEBCFG_SUCCESS;
 	}
 	else
@@ -498,7 +510,7 @@ WEBCFG_STATUS parseMultipartDocument(void *config_data, char *ct , size_t data_s
 	str = strtok(NULL, ";");
 	boundary= strtok(str,"=");
 	boundary= strtok(NULL,"=");
-	WebcfgDebug( "boundary %s\n", boundary );
+	WebcfgDebug( "boundary %s", boundary );
 	
 	if(boundary !=NULL)
 	{
@@ -1173,6 +1185,7 @@ size_t headr_callback(char *buffer, size_t size, size_t nitems, void* data)
 
 		if( strncasecmp(CONTENT_LENGTH_HEADER, buffer, content_len) == 0 )
 		{
+			printf("Inside content length\n");
 			header_value = strtok(buffer, ":");
 			while( header_value != NULL )
 			{
@@ -1183,7 +1196,9 @@ size_t headr_callback(char *buffer, size_t size, size_t nitems, void* data)
 					stripspaces(header_str, &final_header);
 					if(g_contentLen != NULL)
 					{
+						printf("Befor free\n");
 						WEBCFG_FREE(g_contentLen);
+						printf("After free\n");
 					}
 					g_contentLen = strdup(final_header);
 				}
@@ -1475,7 +1490,7 @@ VersionList and docList are fetched at once from DB to fix version and docList m
 void refreshConfigVersionList(char *versionsList, int http_status, char *docsList)
 {
 	char *versionsList_tmp = NULL;
-	char *docsList_tmp = NULL;
+	char *docsList_tmp = NULL; 
 	char *root_str = NULL;
 	uint32_t root_version = 0;
 	WEBCFG_STATUS retStatus = WEBCFG_SUCCESS;
@@ -1519,6 +1534,7 @@ void refreshConfigVersionList(char *versionsList, int http_status, char *docsLis
 			{
 				if( strcmp(temp->name,"root") !=0 )
 				{
+					printf("Inside not root\n");
 					versionsList_tmp = strdup(versionsList);
 					sprintf(versionsList, "%s,%lu",versionsList_tmp,(long)temp->version);
 					WEBCFG_FREE(versionsList_tmp);
@@ -2050,6 +2066,7 @@ void subdoc_parser(char *ptr, int no_of_bytes)
 		if(count < SUBDOC_TAG_COUNT)
 		{
 			ptr_lb1 =  memchr(ptr_lb+1, '\n', no_of_bytes - (ptr_lb - str_body));
+			
 			if(0 != memcmp(ptr_lb1-1, "\r",1 ))
 			{
 				ptr_lb1 = memchr(ptr_lb1+1, '\n', no_of_bytes - (ptr_lb - str_body));
@@ -2057,22 +2074,25 @@ void subdoc_parser(char *ptr, int no_of_bytes)
 			index2 = ptr_lb1-str_body;
 			index1 = ptr_lb-str_body;
 			line_parser(str_body+index1+1,index2 - index1 - 2, &name_space, &etag, &data, &data_size);
+
 			ptr_lb++;
 			ptr_lb = memchr(ptr_lb, '\n', no_of_bytes - (ptr_lb - str_body));
 			count++;
 		}
 		else             //For data bin segregation
 		{
+			
 			index2 = no_of_bytes+1;
 			index1 = ptr_lb-str_body;
 			line_parser(str_body+index1+1,index2 - index1 - 2, &name_space, &etag, &data, &data_size);
 			break;
 		}
 	}
-
+	
 	if(etag != 0 && name_space != NULL && data != NULL && data_size != 0 )
 	{
 		addToMpList(etag, name_space, data, data_size);
+
 	}
 	else
 	{
@@ -2106,7 +2126,7 @@ void subdoc_parser(char *ptr, int no_of_bytes)
 void line_parser(char *ptr, int no_of_bytes, char **name_space, uint32_t *etag, char **data, size_t *data_size)
 {
 	char *content_type = NULL;
-
+	printf("The number of bytes is %d\n", no_of_bytes);
 	/*for storing respective values */
 	if(0 == strncmp(ptr,"Content-type: ",strlen("Content-type")))
 	{
@@ -2120,6 +2140,7 @@ void line_parser(char *ptr, int no_of_bytes, char **name_space, uint32_t *etag, 
 	else if(0 == strncasecmp(ptr,"Namespace",strlen("Namespace")))
 	{
 	        *name_space = strndup(ptr+(strlen("Namespace: ")),no_of_bytes-((strlen("Namespace: "))));
+			printf("The name_space is %s", *name_space);
 	}
 	else if(0 == strncasecmp(ptr,"Etag",strlen("Etag")))
 	{
@@ -2133,12 +2154,18 @@ void line_parser(char *ptr, int no_of_bytes, char **name_space, uint32_t *etag, 
 	}
 	else if(strstr(ptr,"parameters"))
 	{
+		printf("Before malloc\n");
 		*data = malloc(sizeof(char) * no_of_bytes );
+		printf("After malloc\n");
+		printf("Before memcpy\n");
+		printf("ptr is %s %d",ptr,no_of_bytes);
 		*data = memcpy(*data, ptr, no_of_bytes );
+		printf("After memcpy\n");
+
 		//store doc size of each sub doc
 		*data_size = no_of_bytes;
+		printf("The data part is:%s\n", *data);
 	}
-
 }
 
 void addToMpList(uint32_t etag, char *name_space, char *data, size_t data_size)

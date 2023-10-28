@@ -88,7 +88,7 @@ set(SOURCES ${SOURCES} ../src/webcfg_client.c ../src/webcfg_aker.c)
 endif (FEATURE_SUPPORT_AKER)
 
 add_executable(test_multipart ${SOURCES})
-target_link_libraries (test_multipart -lcunit -lmsgpackc -lcurl -lpthread  -lm -luuid -ltrower-base64 -lwdmp-c -lcimplog -lcjson -lwrp-c)
+target_link_libraries (test_multipart -lcunit -lmsgpackc -lcurl -lpthread  -lm -luuid -ltrower-base64 -lwdmp-c -lcimplog -lcjson -lwrp-c -lcmocka)
 
 if (WEBCONFIG_BIN_SUPPORT)
 target_link_libraries (test_multipart -lrbus)
@@ -272,7 +272,7 @@ endif (FEATURE_SUPPORT_AKER)
 
 add_executable(test_multipart_unittest ${SOURCES})
 
-target_link_libraries (test_multipart_unittest -lcunit -lmsgpackc -lcurl -lpthread  -lm -luuid -ltrower-base64 -lwdmp-c -lcimplog -lcjson -lwrp-c)
+target_link_libraries (test_multipart_unittest -lcunit -lmsgpackc -lcurl -lpthread  -lm -luuid -ltrower-base64 -lwdmp-c -lcimplog -lcjson -lwrp-c -lcmocka)
 
 if (WEBCONFIG_BIN_SUPPORT)
 target_link_libraries (test_multipart_unittest -lrbus)
@@ -321,6 +321,68 @@ endif (WEBCONFIG_BIN_SUPPORT)
 
 target_link_libraries (test_timer gcov -Wl,--no-as-needed )
 
+#-------------------------------------------------------------------------------
+#   test_notify
+#-------------------------------------------------------------------------------
+add_test(NAME test_notify COMMAND ${MEMORY_CHECK} ./test_notify)
+add_executable(test_notify test_notify.c ../src/webcfg_notify.c)
+target_link_libraries (test_notify -lcunit -lmsgpackc -lcimplog -ltrower-base64 -lwdmp-c -lcjson -lpthread)
+ 
+target_link_libraries (test_notify gcov -Wl,--no-as-needed )
+
+#-------------------------------------------------------------------------------
+#   test_generic
+#-------------------------------------------------------------------------------
+add_test(NAME test_generic_pc COMMAND ${MEMORY_CHECK} ./test_generic_pc)
+add_executable(test_generic_pc test_generic_pc.c ../src/webcfg_generic_pc.c)
+target_link_libraries (test_generic_pc -lcunit -lmsgpackc -lcimplog -ltrower-base64 -lwdmp-c -lcjson)
+ 
+if (WEBCONFIG_BIN_SUPPORT)
+target_link_libraries (test_generic_pc -lrbus)
+endif (WEBCONFIG_BIN_SUPPORT)
+ 
+target_link_libraries (test_generic_pc gcov -Wl,--no-as-needed )
+
+#-------------------------------------------------------------------------------
+#   test_blob
+#-------------------------------------------------------------------------------
+add_test(NAME test_blob COMMAND ${MEMORY_CHECK} ./test_blob)
+add_executable(test_blob test_blob.c ../src/webcfg_blob.c)
+target_link_libraries (test_blob -lcunit -lmsgpackc -lcimplog -lcjson -ltrower-base64 )
+
+target_link_libraries (test_blob gcov -Wl,--no-as-needed )
+
+#-------------------------------------------------------------------------------
+#   test_cmoka_multipart.c
+#-------------------------------------------------------------------------------
+add_test(NAME test_cmoka_multipart COMMAND ${MEMORY_CHECK} ./test_cmoka_multipart)
+
+set(SOURCES test_cmoka_multipart.c ../src/webcfg_param.c ../src/webcfg_multipart.c ../src/webcfg_helpers.c ../src/webcfg.c ../src/webcfg_auth.c ../src/webcfg_notify.c ../src/webcfg_db.c ../src/webcfg_pack.c ../src/webcfg_blob.c ../src/webcfg_event.c ../src/webcfg_generic_pc.c ../src/webcfg_metadata.c)
+
+if (WEBCONFIG_BIN_SUPPORT)
+set(SOURCES ${SOURCES} ../src/webcfg_rbus.c)
+endif (WEBCONFIG_BIN_SUPPORT)
+
+if (FEATURE_SUPPORT_AKER)
+set(SOURCES ${SOURCES} ../src/webcfg_client.c ../src/webcfg_aker.c)
+endif (FEATURE_SUPPORT_AKER)
+
+add_executable(test_cmoka_multipart ${SOURCES})
+
+target_link_libraries (test_cmoka_multipart -lcmocka -lcunit -lmsgpackc -lpthread  -lm -luuid -ltrower-base64 -lwdmp-c -lcimplog -lcjson -lwrp-c -lcurl )
+
+if (WEBCONFIG_BIN_SUPPORT)
+target_link_libraries (test_cmoka_multipart -lrbus)
+endif (WEBCONFIG_BIN_SUPPORT)
+
+if (FEATURE_SUPPORT_AKER)
+target_link_libraries (test_cmoka_multipart -llibparodus -lnanomsg)
+endif (FEATURE_SUPPORT_AKER)
+
+target_link_libraries (test_cmoka_multipart gcov -Wl,--no-as-needed )
+
+
+
 # Code coverage
 
 add_custom_target(coverage
@@ -350,6 +412,14 @@ COMMAND lcov -q --capture --directory
 ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/test_rbus_fr.dir/__/src --output-file test_rbus_fr.info
 COMMAND lcov -q --capture --directory
 ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/test_timer.dir/__/src --output-file test_timer.info
+COMMAND lcov -q --capture --directory 
+${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/test_notify.dir/__/src --output-file test_notify.info
+COMMAND lcov -q --capture --directory 
+${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/test_generic_pc.dir/__/src --output-file test_generic_pc.info
+COMMAND lcov -q --capture --directory 
+${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/test_blob.dir/__/src --output-file test_blob.info
+COMMAND lcov -q --capture --directory
+${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/test_cmoka_multipart.dir/__/src --output-file test_cmoka_multipart.info
 
 
 COMMAND lcov
@@ -366,6 +436,10 @@ COMMAND lcov
 -a test_generic.info
 -a test_rbus_fr.info
 -a test_timer.info
+-a test_notify.info
+-a test_generic_pc.info
+-a test_blob.info
+-a test_cmoka_multipart.info
 --output-file coverage.info
 
 COMMAND genhtml coverage.info

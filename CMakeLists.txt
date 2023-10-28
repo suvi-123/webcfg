@@ -66,7 +66,6 @@ if (MULTIPART_UTILITY)
 add_definitions(-DMULTIPART_UTILITY)
 endif (MULTIPART_UTILITY)
 
-if (WEBCONFIG_BIN_SUPPORT)
 
 # rbus external dependency
 #-------------------------------------------------------------------------------
@@ -86,6 +85,7 @@ add_dependencies(librtMessage rtMessage)
 add_library(librbus STATIC SHARED IMPORTED)
 add_dependencies(librbus rbus)
 endif (WEBCONFIG_BIN_SUPPORT)
+
 
 # msgpack-c external dependency
 #-------------------------------------------------------------------------------
@@ -209,6 +209,22 @@ ExternalProject_Add(libparodus
 add_library(liblibparodus STATIC SHARED IMPORTED)
 add_dependencies(liblibparodus libparodus)
 endif (FEATURE_SUPPORT_AKER)
+
+if (WEBCONFIG_BIN_SUPPORT)
+
+if (BUILD_TESTING)
+# cmocka external dependency
+#-------------------------------------------------------------------------------
+ExternalProject_Add(cmocka
+    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/_prefix/cmocka
+    GIT_REPOSITORY https://github.com/elventear/cmocka.git
+    GIT_TAG "b71a3060699bc1a5b00e958be353772f42545ac2"
+    CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+)
+add_library(libcmocka STATIC SHARED IMPORTED)
+add_dependencies(libcmocka cmocka)
+
+endif (BUILD_TESTING)
 
 endif ()
 link_directories ( ${LIBRARY_DIR} ${COMMON_LIBRARY_DIR} ${LIBRARY_DIR64} )
