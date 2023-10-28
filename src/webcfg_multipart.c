@@ -1173,6 +1173,7 @@ size_t headr_callback(char *buffer, size_t size, size_t nitems, void* data)
 
 		if( strncasecmp(CONTENT_LENGTH_HEADER, buffer, content_len) == 0 )
 		{
+			printf("Inside content length\n");
 			header_value = strtok(buffer, ":");
 			while( header_value != NULL )
 			{
@@ -1183,7 +1184,9 @@ size_t headr_callback(char *buffer, size_t size, size_t nitems, void* data)
 					stripspaces(header_str, &final_header);
 					if(g_contentLen != NULL)
 					{
+						printf("Befor free\n");
 						WEBCFG_FREE(g_contentLen);
+						printf("After free\n");
 					}
 					g_contentLen = strdup(final_header);
 				}
@@ -1475,7 +1478,7 @@ VersionList and docList are fetched at once from DB to fix version and docList m
 void refreshConfigVersionList(char *versionsList, int http_status, char *docsList)
 {
 	char *versionsList_tmp = NULL;
-	char *docsList_tmp = NULL;
+	char *docsList_tmp = NULL; 
 	char *root_str = NULL;
 	uint32_t root_version = 0;
 	WEBCFG_STATUS retStatus = WEBCFG_SUCCESS;
@@ -2045,34 +2048,46 @@ void subdoc_parser(char *ptr, int no_of_bytes)
 	int index1=0, index2 =0;
 	int count = 0;
 
+	printf("The number of bytes is %d\n", no_of_bytes);
 	while((ptr_lb - str_body) < no_of_bytes)
 	{
 		if(count < SUBDOC_TAG_COUNT)
 		{
+			printf("Inside if\n");
 			ptr_lb1 =  memchr(ptr_lb+1, '\n', no_of_bytes - (ptr_lb - str_body));
+			
+			printf("After memchar\n");
 			if(0 != memcmp(ptr_lb1-1, "\r",1 ))
 			{
+				printf("Inside second if\n");
 				ptr_lb1 = memchr(ptr_lb1+1, '\n', no_of_bytes - (ptr_lb - str_body));
 			}
 			index2 = ptr_lb1-str_body;
 			index1 = ptr_lb-str_body;
+			printf("Index1 %d Index2 %d\n", index1,index2);
 			line_parser(str_body+index1+1,index2 - index1 - 2, &name_space, &etag, &data, &data_size);
+			printf("After line parser\n");
+
 			ptr_lb++;
 			ptr_lb = memchr(ptr_lb, '\n', no_of_bytes - (ptr_lb - str_body));
 			count++;
+			printf("The count is %d\n",count);
 		}
 		else             //For data bin segregation
 		{
+			printf("Inside else\n");
+			
 			index2 = no_of_bytes+1;
 			index1 = ptr_lb-str_body;
 			line_parser(str_body+index1+1,index2 - index1 - 2, &name_space, &etag, &data, &data_size);
 			break;
 		}
 	}
-
+	
 	if(etag != 0 && name_space != NULL && data != NULL && data_size != 0 )
 	{
 		addToMpList(etag, name_space, data, data_size);
+
 	}
 	else
 	{
@@ -2106,7 +2121,7 @@ void subdoc_parser(char *ptr, int no_of_bytes)
 void line_parser(char *ptr, int no_of_bytes, char **name_space, uint32_t *etag, char **data, size_t *data_size)
 {
 	char *content_type = NULL;
-
+	printf("The number of bytes is %d\n", no_of_bytes);
 	/*for storing respective values */
 	if(0 == strncmp(ptr,"Content-type: ",strlen("Content-type")))
 	{
@@ -2120,6 +2135,7 @@ void line_parser(char *ptr, int no_of_bytes, char **name_space, uint32_t *etag, 
 	else if(0 == strncasecmp(ptr,"Namespace",strlen("Namespace")))
 	{
 	        *name_space = strndup(ptr+(strlen("Namespace: ")),no_of_bytes-((strlen("Namespace: "))));
+			printf("The name_space is %s", *name_space);
 	}
 	else if(0 == strncasecmp(ptr,"Etag",strlen("Etag")))
 	{
@@ -2133,12 +2149,18 @@ void line_parser(char *ptr, int no_of_bytes, char **name_space, uint32_t *etag, 
 	}
 	else if(strstr(ptr,"parameters"))
 	{
+		printf("Before malloc\n");
 		*data = malloc(sizeof(char) * no_of_bytes );
+		printf("After malloc\n");
+		printf("Before memcpy\n");
+		printf("ptr is %s %d",ptr,no_of_bytes);
 		*data = memcpy(*data, ptr, no_of_bytes );
+		printf("After memcpy\n");
+
 		//store doc size of each sub doc
 		*data_size = no_of_bytes;
+		printf("The data part is:%s\n", *data);
 	}
-
 }
 
 void addToMpList(uint32_t etag, char *name_space, char *data, size_t data_size)

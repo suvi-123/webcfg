@@ -88,7 +88,7 @@ set(SOURCES ${SOURCES} ../src/webcfg_client.c ../src/webcfg_aker.c)
 endif (FEATURE_SUPPORT_AKER)
 
 add_executable(test_multipart ${SOURCES})
-target_link_libraries (test_multipart -lcunit -lmsgpackc -lcurl -lpthread  -lm -luuid -ltrower-base64 -lwdmp-c -lcimplog -lcjson -lwrp-c)
+target_link_libraries (test_multipart -lcunit -lmsgpackc -lcurl -lpthread  -lm -luuid -ltrower-base64 -lwdmp-c -lcimplog -lcjson -lwrp-c -lcmocka)
 
 if (WEBCONFIG_BIN_SUPPORT)
 target_link_libraries (test_multipart -lrbus)
@@ -272,7 +272,7 @@ endif (FEATURE_SUPPORT_AKER)
 
 add_executable(test_multipart_unittest ${SOURCES})
 
-target_link_libraries (test_multipart_unittest -lcunit -lmsgpackc -lcurl -lpthread  -lm -luuid -ltrower-base64 -lwdmp-c -lcimplog -lcjson -lwrp-c)
+target_link_libraries (test_multipart_unittest -lcunit -lmsgpackc -lcurl -lpthread  -lm -luuid -ltrower-base64 -lwdmp-c -lcimplog -lcjson -lwrp-c -lcmocka)
 
 if (WEBCONFIG_BIN_SUPPORT)
 target_link_libraries (test_multipart_unittest -lrbus)
